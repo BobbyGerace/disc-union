@@ -20,9 +20,9 @@ describe('match', () => {
       baz: () => true
     });
 
-    expect(matchFBB(someFoo)).toEqual('hello');
-    expect(matchFBB(someBar)).toEqual(4);
-    expect(matchFBB(someBaz)).toEqual(true);
+    expect(matchFBB(someFoo)).toBe('hello');
+    expect(matchFBB(someBar)).toBe(4);
+    expect(matchFBB(someBaz)).toBe(true);
   });
   
   it('handles partial match correctly', () => {
@@ -30,9 +30,9 @@ describe('match', () => {
       foo: foo => foo.msg,
     }, fbb => fbb.type);
 
-    expect(matchFBB(someFoo)).toEqual('hello');
-    expect(matchFBB(someBar)).toEqual('bar');
-    expect(matchFBB(someBaz)).toEqual('baz');
+    expect(matchFBB(someFoo)).toBe('hello');
+    expect(matchFBB(someBar)).toBe('bar');
+    expect(matchFBB(someBaz)).toBe('baz');
   });
   
   it('handles kind correctly', () => {
@@ -57,12 +57,12 @@ describe('match', () => {
       baz: () => 'ayy'
     }, 'kind');
 
-    expect(matchFBB(someFooK)).toEqual('hello');
-    expect(matchFBB(someBarK)).toEqual('bar');
-    expect(matchFBB(someBazK)).toEqual('baz');
+    expect(matchFBB(someFooK)).toBe('hello');
+    expect(matchFBB(someBarK)).toBe('bar');
+    expect(matchFBB(someBazK)).toBe('baz');
 
-    expect(matchFBB2(someFooK)).toEqual('hello');
-    expect(matchFBB2(someBarK)).toEqual(4);
-    expect(matchFBB2(someBazK)).toEqual('ayy');
+    expect(matchFBB2(someFooK)).toBe('hello');
+    expect(matchFBB2(someBarK)).toBe(4);
+    expect(matchFBB2(someBazK)).toBe('ayy');
   });
 });

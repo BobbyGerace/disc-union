@@ -24,7 +24,7 @@ describe('discUnion', () => {
 
     const someBaz = FooBarBaz.baz();
 
-    expect(someBaz.kind).toEqual('baz');
+    expect(someBaz.kind).toBe('baz');
   });
 
   it('overwrites "type"', () => {
@@ -34,7 +34,7 @@ describe('discUnion', () => {
 
     const someFoo = FooBarBaz.foo(4, true);
 
-    expect(someFoo.type).toEqual('foo');
+    expect(someFoo.type).toBe('foo');
 
     const FBBKind = discUnion({
       foo: (value: number, kind: boolean) => ({ value, kind }),
@@ -42,6 +42,6 @@ describe('discUnion', () => {
 
     const someKindFoo = FBBKind.foo(4, true);
 
-    expect(someKindFoo.kind).toEqual('foo');
+    expect(someKindFoo.kind).toBe('foo');
   });
 });
