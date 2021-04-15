@@ -1,7 +1,9 @@
-type DiscUnionBase<TypeKey extends string> = { [M in TypeKey]: string };
+export type DiscUnionBase<TypeKey extends string> = { [M in TypeKey]: string };
 
-type Constructor = (...args: any[]) => object;
-type Constructors = Record<string, Constructor>;
+export type Constructor = (...args: any[]) => object;
+export type Constructors = Record<string, Constructor>;
+
+export type WithType<T extends object, K extends string, TypeKey extends string> = Omit<T, TypeKey> & { [M in TypeKey]: K };
 
 /**
  * Takes an object of type constructors, and returns a discriminated
@@ -36,16 +38,16 @@ export type Keys<
   TypeKey extends string = "type"
 > = T[TypeKey];
 
-type ConstructorsWithType<
+export type ConstructorsWithType<
   T extends Constructors,
   TypeKey extends string = "type"
 > = {
   [K in keyof T]: <R extends ReturnType<T[K]>>(
     ...args: Parameters<T[K]>
-  ) => R & { [M in TypeKey]: K };
+  ) => WithType<R, Extract<K, string>, TypeKey>;
 };
 
-type Handlers<
+export type Handlers<
   T extends DiscUnionBase<TypeKey>,
   R,
   TypeKey extends string = "type"
@@ -144,7 +146,7 @@ export const discUnionFactory = <FactoryTypeKey extends string>(
     type: T,
     obj: O,
     typeKey = factoryTypeKey as TypeKey
-  ) => ({ ...obj, [typeKey]: type } as { [M in TypeKey]: T } & O);
+  ) => ({ ...obj, [typeKey]: type } as WithType<O, T, TypeKey>);
 
   const validateType = <
     T extends DiscUnionBase<TypeKey>,

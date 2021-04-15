@@ -15,6 +15,33 @@ describe('discUnion', () => {
     expect(someFoo).toEqual({ type: 'foo', msg: 'hello' });
     expect(someBar).toEqual({ type: 'bar', count: 4 });
     expect(someBaz).toEqual({ type: 'baz' });
-
   });
-})
+
+  it('uses typeKey correctly', () => {
+    const FooBarBaz = discUnion({
+      baz: () => ({}),
+    }, 'kind');
+
+    const someBaz = FooBarBaz.baz();
+
+    expect(someBaz.kind).toEqual('baz');
+  });
+
+  it('overwrites "type"', () => {
+    const FooBarBaz = discUnion({
+      foo: (value: number, type: boolean) => ({ value, type }),
+    });
+
+    const someFoo = FooBarBaz.foo(4, true);
+
+    expect(someFoo.type).toEqual('foo');
+
+    const FBBKind = discUnion({
+      foo: (value: number, kind: boolean) => ({ value, kind }),
+    }, 'kind');
+
+    const someKindFoo = FBBKind.foo(4, true);
+
+    expect(someKindFoo.kind).toEqual('foo');
+  });
+});
