@@ -226,7 +226,7 @@ const fns = discUnionFactory("type");
  * @param constructors - Object containing constructors
  * @param typeKey - Discriminant property
  */
-export const discUnion = fns.mapIfType;
+export const discUnion = fns.discUnion;
 
 /**
  * Returns the result of mapper if value is of the specified type,
