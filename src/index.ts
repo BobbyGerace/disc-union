@@ -45,10 +45,10 @@ export type ConstructorsWithType<
 > = {
   [K in keyof T]: {
     <R extends ReturnType<T[K]>>(
-    ...args: Parameters<T[K]>
-  ): WithType<R, `${Prefix}${Extract<K, string>}`, TypeKey>;
+      ...args: Parameters<T[K]>
+    ): WithType<R, `${Prefix}${Extract<K, string>}`, TypeKey>;
     key: `${Prefix}${Extract<K, string>}`
-    }
+  }
 };
 
 export type Handlers<
@@ -110,11 +110,9 @@ export const factory = <FactoryTypeKey extends string>(
 
     const handler = handlers[value[typeKey] as T[TypeKey]];
 
-    return (
-      handler ? handler(
-        value as Extract<T, { [M in TypeKey]: string }>
-      ) : otherwise!(value as Exclude<T, { [M in TypeKey]: keyof R }>)
-    );
+    return handler ? handler(
+      value as Extract<T, { [M in TypeKey]: string }>
+    ) : otherwise!(value as Exclude<T, { [M in TypeKey]: keyof R }>);
   }
 
   const is = <
@@ -227,7 +225,6 @@ export const factory = <FactoryTypeKey extends string>(
     createType,
   };
 };
-
 
 const fns = factory("type");
 
