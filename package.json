@@ -7,7 +7,8 @@
   "scripts": {
     "test": "jest",
     "test:watch": "jest --watch",
-    "prepublish": "tsc"
+    "prepublish": "tsc",
+    "build": "tsc"
   },
   "repository": {
     "type": "git",

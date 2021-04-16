@@ -17,5 +17,5 @@
     "stripInternal": true
   },
   "files": ["./src/index.ts"],
-  "include": ["./src", "./test"]
+  "include": ["./src"]
 }
