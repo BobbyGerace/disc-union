@@ -164,7 +164,7 @@ export const discUnionFactory = <FactoryTypeKey extends string>(
       );
   };
 
-  function maybeGet<
+  function maybeGetType<
     T extends DiscUnionBase<TypeKey>,
     K extends T[TypeKey],
     TypeKey extends string = FactoryTypeKey
@@ -173,12 +173,12 @@ export const discUnionFactory = <FactoryTypeKey extends string>(
     obj: SingleType<T, K, TypeKey>,
     typeKey?: TypeKey
   ): SingleType<T, K, TypeKey>;
-  function maybeGet<
+  function maybeGetType<
     T extends DiscUnionBase<TypeKey>,
     K extends T[TypeKey],
     TypeKey extends string | FactoryTypeKey = FactoryTypeKey
   >(type: K, obj: T, typeKey?: TypeKey): SingleType<T, K, TypeKey> | null;
-  function maybeGet<
+  function maybeGetType<
     T extends DiscUnionBase<TypeKey>,
     K extends T[TypeKey],
     TypeKey extends string | FactoryTypeKey = FactoryTypeKey
@@ -191,7 +191,7 @@ export const discUnionFactory = <FactoryTypeKey extends string>(
     else return null;
   }
 
-  const mapIfType = <
+  const mapType = <
     T extends DiscUnionBase<TypeKey>,
     K extends T[TypeKey],
     R,
@@ -208,14 +208,15 @@ export const discUnionFactory = <FactoryTypeKey extends string>(
 
   return {
     discUnion,
-    mapIfType,
     match,
-    maybeGet,
+    mapType,
+    maybeGetType,
     isType,
     validateType,
     createType,
   };
 };
+
 
 const fns = discUnionFactory("type");
 
@@ -240,7 +241,7 @@ export const discUnion = fns.discUnion;
  * @param mapper - Function to be called on obj
  * @param typeKey - Discriminant property
  */
-export const mapIfType = fns.mapIfType;
+export const mapType = fns.mapType;
 
 /**
  * Takes an object to match, and an object of handlers whose
@@ -267,7 +268,7 @@ export const match = fns.match;
  * @param obj - Value to get
  * @param typeKey - Discriminant property
  */
-export const maybeGet = fns.maybeGet;
+export const maybeGetType = fns.maybeGetType;
 
 /**
  * Determines if the value matches the specified type
