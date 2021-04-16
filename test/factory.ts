@@ -5,7 +5,7 @@ const {
   match,
   is,
   map,
-  maybeGet,
+  get,
   validate,
   createType,
 } = factory("noice");
@@ -50,8 +50,8 @@ describe('factory', () => {
     })).toBe(someFoo.msg);
   });
 
-  it('creates "maybeGet" with different default typeKey', () => {
-    expect(maybeGet('foo', unknownFoo)).toBe(someFoo);
+  it('creates "get" with different default typeKey', () => {
+    expect(get('foo', unknownFoo)).toBe(someFoo);
   });
 
   it('creates "validate" with different default typeKey', () => {

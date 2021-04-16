@@ -164,7 +164,7 @@ export const factory = <FactoryTypeKey extends string>(
       );
   };
 
-  function maybeGet<
+  function get<
     T extends DiscUnionBase<TypeKey>,
     K extends T[TypeKey],
     TypeKey extends string = FactoryTypeKey
@@ -173,12 +173,12 @@ export const factory = <FactoryTypeKey extends string>(
     obj: SingleType<T, K, TypeKey>,
     typeKey?: TypeKey
   ): SingleType<T, K, TypeKey>;
-  function maybeGet<
+  function get<
     T extends DiscUnionBase<TypeKey>,
     K extends T[TypeKey],
     TypeKey extends string | FactoryTypeKey = FactoryTypeKey
   >(type: K, obj: T, typeKey?: TypeKey): SingleType<T, K, TypeKey> | null;
-  function maybeGet<
+  function get<
     T extends DiscUnionBase<TypeKey>,
     K extends T[TypeKey],
     TypeKey extends string | FactoryTypeKey = FactoryTypeKey
@@ -210,7 +210,7 @@ export const factory = <FactoryTypeKey extends string>(
     discUnion,
     match,
     map,
-    maybeGet,
+    get,
     is,
     validate,
     createType,
@@ -268,7 +268,7 @@ export const match = fns.match;
  * @param obj - Value to get
  * @param typeKey - Discriminant property
  */
-export const maybeGet = fns.maybeGet;
+export const get = fns.get;
 
 /**
  * Determines if the value matches the specified type
