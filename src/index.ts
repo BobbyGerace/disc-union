@@ -60,7 +60,7 @@ export type Handlers<
  * to have a different default discriminant than 'type'
  * @param factoryTypeKey - The default discriminant property of the functions
  */
-export const discUnionFactory = <FactoryTypeKey extends string>(
+export const factory = <FactoryTypeKey extends string>(
   factoryTypeKey: FactoryTypeKey
 ) => {
 
@@ -111,7 +111,7 @@ export const discUnionFactory = <FactoryTypeKey extends string>(
     );
   }
 
-  const isType = <
+  const is = <
     T extends DiscUnionBase<TypeKey>,
     K extends T[TypeKey],
     TypeKey extends string | FactoryTypeKey = FactoryTypeKey
@@ -148,7 +148,7 @@ export const discUnionFactory = <FactoryTypeKey extends string>(
     typeKey = factoryTypeKey as TypeKey
   ) => ({ ...obj, [typeKey]: type } as WithType<O, T, TypeKey>);
 
-  const validateType = <
+  const validate = <
     T extends DiscUnionBase<TypeKey>,
     K extends T[TypeKey],
     TypeKey extends string | FactoryTypeKey = FactoryTypeKey
@@ -157,14 +157,14 @@ export const discUnionFactory = <FactoryTypeKey extends string>(
     obj: T,
     typeKey = factoryTypeKey as TypeKey
   ) => {
-    if (isType(type, obj, typeKey)) return obj;
+    if (is(type, obj, typeKey)) return obj;
     else
       throw new Error(
         `Expected object of type "${type}", but got "${obj[typeKey]}"`
       );
   };
 
-  function maybeGetType<
+  function maybeGet<
     T extends DiscUnionBase<TypeKey>,
     K extends T[TypeKey],
     TypeKey extends string = FactoryTypeKey
@@ -173,12 +173,12 @@ export const discUnionFactory = <FactoryTypeKey extends string>(
     obj: SingleType<T, K, TypeKey>,
     typeKey?: TypeKey
   ): SingleType<T, K, TypeKey>;
-  function maybeGetType<
+  function maybeGet<
     T extends DiscUnionBase<TypeKey>,
     K extends T[TypeKey],
     TypeKey extends string | FactoryTypeKey = FactoryTypeKey
   >(type: K, obj: T, typeKey?: TypeKey): SingleType<T, K, TypeKey> | null;
-  function maybeGetType<
+  function maybeGet<
     T extends DiscUnionBase<TypeKey>,
     K extends T[TypeKey],
     TypeKey extends string | FactoryTypeKey = FactoryTypeKey
@@ -187,11 +187,11 @@ export const discUnionFactory = <FactoryTypeKey extends string>(
     obj: T,
     typeKey = factoryTypeKey as TypeKey
   ): SingleType<T, K, TypeKey> | null {
-    if (isType(type, obj, typeKey)) return obj;
+    if (is(type, obj, typeKey)) return obj;
     else return null;
   }
 
-  const mapType = <
+  const map = <
     T extends DiscUnionBase<TypeKey>,
     K extends T[TypeKey],
     R,
@@ -202,23 +202,23 @@ export const discUnionFactory = <FactoryTypeKey extends string>(
     mapper: (o: SingleType<T, K, TypeKey>) => R,
     typeKey = factoryTypeKey as TypeKey
   ) => {
-    if (isType(type, obj, typeKey)) return mapper(obj);
+    if (is(type, obj, typeKey)) return mapper(obj);
     else return obj;
   };
 
   return {
     discUnion,
     match,
-    mapType,
-    maybeGetType,
-    isType,
-    validateType,
+    map,
+    maybeGet,
+    is,
+    validate,
     createType,
   };
 };
 
 
-const fns = discUnionFactory("type");
+const fns = factory("type");
 
 /**
  * Accepts an object of constructor functions,
@@ -241,7 +241,7 @@ export const discUnion = fns.discUnion;
  * @param mapper - Function to be called on obj
  * @param typeKey - Discriminant property
  */
-export const mapType = fns.mapType;
+export const map = fns.map;
 
 /**
  * Takes an object to match, and an object of handlers whose
@@ -268,7 +268,7 @@ export const match = fns.match;
  * @param obj - Value to get
  * @param typeKey - Discriminant property
  */
-export const maybeGetType = fns.maybeGetType;
+export const maybeGet = fns.maybeGet;
 
 /**
  * Determines if the value matches the specified type
@@ -278,7 +278,7 @@ export const maybeGetType = fns.maybeGetType;
  * @param obj - Value to check
  * @param typeKey - Discriminant property
  */
-export const isType = fns.isType;
+export const is = fns.is;
 
 /**
  * Narrows the type of the value if it matches, throws
@@ -289,7 +289,7 @@ export const isType = fns.isType;
  * @param obj - Value to check
  * @param typeKey - Discriminant property
  */
-export const validateType = fns.validateType;
+export const validate = fns.validate;
 
 /**
  * Convenience function for adding a type discriminant 
