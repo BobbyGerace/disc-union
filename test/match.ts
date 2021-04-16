@@ -35,11 +35,11 @@ describe('match', () => {
     expect(matchFBB(someBaz)).toBe('baz');
   });
   
-  it('works with computed keys', () => {
+  it('works with string keys', () => {
     const Dinosaur = discUnion({
-      ['@dinosaur/t-rex']: (name: string) => ({ name }),
-      ['@dinosaur/pterodactyl']: (wingspan: number) => ({ wingspan }),
-      ['@dinosaur/stegosaurus']: (numPlates: number) => ({ numPlates })
+      '@dinosaur/t-rex': (name: string) => ({ name }),
+      '@dinosaur/pterodactyl': (wingspan: number) => ({ wingspan }),
+      '@dinosaur/stegosaurus': (numPlates: number) => ({ numPlates })
     });
     type Dinosaur = DiscUnionOf<typeof Dinosaur>;
 
@@ -48,9 +48,9 @@ describe('match', () => {
     const someStegosaurus = Dinosaur['@dinosaur/stegosaurus'](7);
 
     const describeDino = (dino: Dinosaur) => match(dino, {
-      ['@dinosaur/t-rex']: tRex => `A T-Rex named ${tRex.name}`,
-      ['@dinosaur/pterodactyl']: pt => `A pterodactyl with a ${pt.wingspan} foot wingspan`,
-      ['@dinosaur/stegosaurus']: steg => `A stegosaurus with ${steg.numPlates} plates along its back`,
+      '@dinosaur/t-rex': tRex => `A T-Rex named ${tRex.name}`,
+      '@dinosaur/pterodactyl': pt => `A pterodactyl with a ${pt.wingspan} foot wingspan`,
+      '@dinosaur/stegosaurus': steg => `A stegosaurus with ${steg.numPlates} plates along its back`,
     });
 
     expect(describeDino(someTRex)).toBe('A T-Rex named Bill');

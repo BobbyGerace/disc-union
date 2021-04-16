@@ -40,11 +40,15 @@ export type Keys<
 
 export type ConstructorsWithType<
   T extends Constructors,
-  TypeKey extends string = "type"
+  TypeKey extends string = "type",
+  Prefix extends string = '',
 > = {
-  [K in keyof T]: <R extends ReturnType<T[K]>>(
+  [K in keyof T]: {
+    <R extends ReturnType<T[K]>>(
     ...args: Parameters<T[K]>
-  ) => WithType<R, Extract<K, string>, TypeKey>;
+  ): WithType<R, `${Prefix}${Extract<K, string>}`, TypeKey>;
+    key: `${Prefix}${Extract<K, string>}`
+    }
 };
 
 export type Handlers<
@@ -104,10 +108,12 @@ export const factory = <FactoryTypeKey extends string>(
       typeKey = ot ?? (factoryTypeKey as TypeKey);
     }
 
+    const handler = handlers[value[typeKey] as T[TypeKey]];
+
     return (
-      handlers[value[typeKey] as T[TypeKey]]?.(
+      handler ? handler(
         value as Extract<T, { [M in TypeKey]: string }>
-      ) ?? otherwise!(value as Exclude<T, { [M in TypeKey]: keyof R }>)
+      ) : otherwise!(value as Exclude<T, { [M in TypeKey]: keyof R }>)
     );
   }
 
@@ -121,21 +127,26 @@ export const factory = <FactoryTypeKey extends string>(
     typeKey = factoryTypeKey as TypeKey
   ): value is SingleType<T, K, TypeKey> => value[typeKey] === type;
 
-  const discUnion = <
+  function discUnion<
     T extends Constructors,
+    P extends string = '',
     TypeKey extends string | FactoryTypeKey = FactoryTypeKey
   >(
     constructors: T,
-    typeKey = factoryTypeKey as TypeKey
-  ): ConstructorsWithType<T, TypeKey> => {
-    const constructorsWithType: Record<string, Function> = {};
+    typeKey = factoryTypeKey as TypeKey,
+    prefix = '' as P,
+  ): ConstructorsWithType<T, TypeKey, P> {
+    const constructorsWithType: Record<string, Function & { key?: string }> = {};
 
     for (const key in constructors) {
+      const fullKey = prefix + key;
+
       constructorsWithType[key] = (...args: any[]) =>
-        createType(key, constructors[key](...args), typeKey);
+        createType(fullKey, constructors[key](...args), typeKey);
+      constructorsWithType[key].key = fullKey;
     }
 
-    return constructorsWithType as ConstructorsWithType<T, TypeKey>;
+    return constructorsWithType as ConstructorsWithType<T, TypeKey, P>;
   };
 
   const createType = <
