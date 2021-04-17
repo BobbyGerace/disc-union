@@ -6,6 +6,8 @@ Discriminated unions are a powerful and expressive way of modelling data in Type
 
 We aim to be generic by leveraging Typescripts type inference to determine the types. So these functions work well with any discriminated union, no matter how they are constructed.
 
+Note: This library uses Typescript's template literal types, and so requires Typescript version >= 4.1
+
 ## Motivating Example
 ### State of an API call in React
 ```tsx
