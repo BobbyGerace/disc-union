@@ -1,4 +1,4 @@
-export type DiscUnionBase<TypeKey extends string> = { [M in TypeKey]: string };
+export type DiscUnionType<TypeKey extends string> = { [M in TypeKey]: string };
 
 export type Constructor = (...args: any[]) => object;
 export type Constructors = Record<string, Constructor>;
@@ -22,10 +22,22 @@ export type DiscUnionOf<
  * @param TypeKey - the name of the discriminant property - defaults to 'type'
  */
 export type Narrow<
-  T extends DiscUnionBase<TypeKey>,
+  T extends DiscUnionType<TypeKey>,
   K extends T[TypeKey],
   TypeKey extends string = "type"
 > = Extract<T, { [M in TypeKey]: K }>;
+
+/**
+ * Takes any discriminated union, and excludes the type of the provided key
+ * @param T - any discriminated union
+ * @param K - the name(s) of the types to narrow to
+ * @param TypeKey - the name of the discriminant property - defaults to 'type'
+ */
+export type Without<
+  T extends DiscUnionType<TypeKey>,
+  K extends string | number | symbol,
+  TypeKey extends string = "type"
+> = Exclude<T, { [M in TypeKey]: K }>;
 
 /**
  * Takes any discriminated union, and returns all possible
@@ -34,7 +46,7 @@ export type Narrow<
  * @param TypeKey - the name of the discriminant property - defaults to 'type'
  */
 export type Keys<
-  T extends DiscUnionBase<TypeKey>,
+  T extends DiscUnionType<TypeKey>,
   TypeKey extends string = "type"
 > = T[TypeKey];
 
@@ -52,7 +64,7 @@ export type ConstructorsWithType<
 };
 
 export type Handlers<
-  T extends DiscUnionBase<TypeKey>,
+  T extends DiscUnionType<TypeKey>,
   R,
   TypeKey extends string = "type"
 > = {
@@ -69,7 +81,7 @@ export const factory = <FactoryTypeKey extends string>(
 ) => {
 
   function match<
-    T extends DiscUnionBase<TypeKey>,
+    T extends DiscUnionType<TypeKey>,
     R extends Handlers<T, unknown, TypeKey>,
     TypeKey extends string | FactoryTypeKey = FactoryTypeKey
   >(
@@ -78,29 +90,29 @@ export const factory = <FactoryTypeKey extends string>(
     typeKey?: TypeKey
   ): R extends Handlers<T, infer RT, TypeKey> ? RT : never;
   function match<
-    T extends DiscUnionBase<TypeKey>,
+    T extends DiscUnionType<TypeKey>,
     R extends Partial<Handlers<T, unknown, TypeKey>>,
     E,
     TypeKey extends string | FactoryTypeKey = FactoryTypeKey
   >(
     value: T,
     handlers: R,
-    otherwise: (value: Exclude<T, { [M in TypeKey]: keyof R }>) => E,
+    otherwise: (value: Without<T, keyof R, TypeKey>) => E,
     typeKey?: TypeKey
   ): (R extends Partial<Handlers<T, infer RT, TypeKey>> ? RT : never) | E;
   function match<
-    T extends DiscUnionBase<TypeKey>,
+    T extends DiscUnionType<TypeKey>,
     R extends Partial<Handlers<T, unknown, TypeKey>>,
     E,
     TypeKey extends string | FactoryTypeKey = FactoryTypeKey
   >(
     value: T,
     handlers: R,
-    ot?: TypeKey | ((value: Exclude<T, { [M in TypeKey]: keyof R }>) => E),
+    ot?: TypeKey | ((value: Without<T, keyof R, TypeKey>) => E),
     tk?: TypeKey
   ) {
     let typeKey: TypeKey;
-    let otherwise: (value: Exclude<T, { [M in TypeKey]: keyof R }>) => E;
+    let otherwise: (value: Without<T, keyof R, TypeKey>) => E;
     if (typeof ot === "function") {
       otherwise = ot;
       typeKey = tk ?? (factoryTypeKey as TypeKey);
@@ -116,7 +128,7 @@ export const factory = <FactoryTypeKey extends string>(
   }
 
   const is = <
-    T extends DiscUnionBase<TypeKey>,
+    T extends DiscUnionType<TypeKey>,
     K extends T[TypeKey],
     TypeKey extends string | FactoryTypeKey = FactoryTypeKey
   >(
@@ -158,7 +170,7 @@ export const factory = <FactoryTypeKey extends string>(
   ) => ({ ...obj, [typeKey]: type } as WithType<O, T, TypeKey>);
 
   const validate = <
-    T extends DiscUnionBase<TypeKey>,
+    T extends DiscUnionType<TypeKey>,
     K extends T[TypeKey],
     TypeKey extends string | FactoryTypeKey = FactoryTypeKey
   >(
@@ -174,7 +186,7 @@ export const factory = <FactoryTypeKey extends string>(
   };
 
   function get<
-    T extends DiscUnionBase<TypeKey>,
+    T extends DiscUnionType<TypeKey>,
     K extends T[TypeKey],
     TypeKey extends string = FactoryTypeKey
   >(
@@ -183,12 +195,12 @@ export const factory = <FactoryTypeKey extends string>(
     typeKey?: TypeKey
   ): Narrow<T, K, TypeKey>;
   function get<
-    T extends DiscUnionBase<TypeKey>,
+    T extends DiscUnionType<TypeKey>,
     K extends T[TypeKey],
     TypeKey extends string | FactoryTypeKey = FactoryTypeKey
   >(type: K, obj: T, typeKey?: TypeKey): Narrow<T, K, TypeKey> | null;
   function get<
-    T extends DiscUnionBase<TypeKey>,
+    T extends DiscUnionType<TypeKey>,
     K extends T[TypeKey],
     TypeKey extends string | FactoryTypeKey = FactoryTypeKey
   >(
@@ -201,7 +213,7 @@ export const factory = <FactoryTypeKey extends string>(
   }
 
   const map = <
-    T extends DiscUnionBase<TypeKey>,
+    T extends DiscUnionType<TypeKey>,
     K extends T[TypeKey],
     R,
     TypeKey extends string | FactoryTypeKey = FactoryTypeKey
