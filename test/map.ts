@@ -1,4 +1,4 @@
-import { DiscUnionOf, discUnion, map, SingleType } from '../src';
+import { DiscUnionOf, discUnion, map, Narrow } from '../src';
 
 const FooBarBaz = discUnion({
   foo: (msg: string) => ({ msg }),
@@ -27,8 +27,8 @@ describe('map', () => {
   it('maps to something else if type', () => {
     const unknownFoo = someFoo as FBB;
     const unknownBar = someBar as FBB;
-    const fooToBaz = (foo: SingleType<FBB, 'foo'>) => someBaz;
-    const barToBaz = (bar: SingleType<FBB, 'bar'>) => someBaz;
+    const fooToBaz = (foo: Narrow<FBB, 'foo'>) => someBaz;
+    const barToBaz = (bar: Narrow<FBB, 'bar'>) => someBaz;
 
     expect(map('foo', unknownFoo, fooToBaz)).toBe(someBaz);
     expect(map('foo', unknownBar, fooToBaz)).toBe(someBar);
@@ -40,8 +40,8 @@ describe('map', () => {
   it('works with typeKey', () => {
     const unknownFooK = someFooK as FBBK;
     const unknownBarK = someBarK as FBBK;
-    const fooToBaz = (foo: SingleType<FBBK, 'foo', 'kind'>) => someBazK;
-    const barToBaz = (bar: SingleType<FBBK, 'bar', 'kind'>) => someBazK;
+    const fooToBaz = (foo: Narrow<FBBK, 'foo', 'kind'>) => someBazK;
+    const barToBaz = (bar: Narrow<FBBK, 'bar', 'kind'>) => someBazK;
 
     expect(map('foo', unknownFooK, fooToBaz, 'kind')).toBe(someBazK);
     expect(map('foo', unknownBarK, fooToBaz, 'kind')).toBe(someBarK);

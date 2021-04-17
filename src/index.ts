@@ -21,7 +21,7 @@ export type DiscUnionOf<
  * @param K - the name(s) of the types to narrow to
  * @param TypeKey - the name of the discriminant property - defaults to 'type'
  */
-export type SingleType<
+export type Narrow<
   T extends DiscUnionBase<TypeKey>,
   K extends T[TypeKey],
   TypeKey extends string = "type"
@@ -56,7 +56,7 @@ export type Handlers<
   R,
   TypeKey extends string = "type"
 > = {
-  [K in T[TypeKey]]: (s: SingleType<T, K, TypeKey>) => R;
+  [K in T[TypeKey]]: (s: Narrow<T, K, TypeKey>) => R;
 };
 
 /**
@@ -123,7 +123,7 @@ export const factory = <FactoryTypeKey extends string>(
     type: K,
     value: T,
     typeKey = factoryTypeKey as TypeKey
-  ): value is SingleType<T, K, TypeKey> => value[typeKey] === type;
+  ): value is Narrow<T, K, TypeKey> => value[typeKey] === type;
 
   function discUnion<
     T extends Constructors,
@@ -179,14 +179,14 @@ export const factory = <FactoryTypeKey extends string>(
     TypeKey extends string = FactoryTypeKey
   >(
     type: K,
-    obj: SingleType<T, K, TypeKey>,
+    obj: Narrow<T, K, TypeKey>,
     typeKey?: TypeKey
-  ): SingleType<T, K, TypeKey>;
+  ): Narrow<T, K, TypeKey>;
   function get<
     T extends DiscUnionBase<TypeKey>,
     K extends T[TypeKey],
     TypeKey extends string | FactoryTypeKey = FactoryTypeKey
-  >(type: K, obj: T, typeKey?: TypeKey): SingleType<T, K, TypeKey> | null;
+  >(type: K, obj: T, typeKey?: TypeKey): Narrow<T, K, TypeKey> | null;
   function get<
     T extends DiscUnionBase<TypeKey>,
     K extends T[TypeKey],
@@ -195,7 +195,7 @@ export const factory = <FactoryTypeKey extends string>(
     type: K,
     obj: T,
     typeKey = factoryTypeKey as TypeKey
-  ): SingleType<T, K, TypeKey> | null {
+  ): Narrow<T, K, TypeKey> | null {
     if (is(type, obj, typeKey)) return obj;
     else return null;
   }
@@ -208,7 +208,7 @@ export const factory = <FactoryTypeKey extends string>(
   >(
     type: K,
     obj: T,
-    mapper: (o: SingleType<T, K, TypeKey>) => R,
+    mapper: (o: Narrow<T, K, TypeKey>) => R,
     typeKey = factoryTypeKey as TypeKey
   ) => {
     if (is(type, obj, typeKey)) return mapper(obj);
