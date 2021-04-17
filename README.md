@@ -51,7 +51,7 @@ function Posts() {
 ```
 
 ## Functions
-### `discUnion` 
+### discUnion
 `discUnion :: (constructors: Constructors, typeKey?: string, prefix?: string)`
 
 `discUnion` takes an object whose values are constructor functions for your types, and whose keys are the names of the corresponding types. It wraps the results of the functions to include the type names automatically. For example:
@@ -86,8 +86,9 @@ function Posts() {
   }, 'species');
 ```
 
-### `match` 
+### match
 `match :: (handlers: Handlers, typeKey?: string)`
+
 `match :: (handlers: Partial<Handlers>, otherwise: Handler, typeKey?: string)`
 
 `match` takes an object of handlers whose keys correspond to the possible keys of the input type, and it returns the result of the matched handler. It is exhaustive by default, but if you include an `otherwise` handler as the second argument then handlers may be partial.
@@ -112,10 +113,10 @@ function Posts() {
   describeDino(Dinosaur.stegosaurus(7)) // Some other dinosaur
 ```
 
-### `is` 
+### is
 `is :: (type: string, obj: DiscriminatedUnionType)`
 
-`is` is a convenience function for narrowing the type of an discriminated union type. It is equivalent to `obj.type === 'something'`.
+`is` is a convenience function for narrowing the type of a discriminated union type. It is equivalent to `obj.type === 'something'`.
 
 ```ts
   if (is('tRex', unknownDino)) {
