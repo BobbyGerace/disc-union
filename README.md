@@ -174,6 +174,31 @@ const someDuck = { kind: 'duck', greeting: 'quack' };
 is('duck', someDuck); // true
 ```
 
+## Utility Types
+
+### DiscUnionOf
+
+`DiscUnionOf<T>`
+
+Takes an object of constructors, and returns a discriminated union based on their return type. Used on the return of `discUnion`
+
+### Narrow
+
+`Narrow<T, Key, TypeKey?>`
+
+Takes a discriminated union type, and narrows it based on a key.
+
+### Without
+
+`Without<T, Key, TypeKey?>`
+
+Opposite of `Narrow`. Takes a discriminated union type, and excludes the types with matching keys.
+
+### Keys
+
+`Keys<T, TypeKey?>`
+
+Takes a discriminated union type, and returns a list of all possible keys as a union of strings
 ## Generics
 
 Unfortunately, due to limitations of Typescript's type inference, there is no way create a generic discriminated union with `discUnion`. You can stil use the library to work with these types, but you'll have to write some of the boilerplate yourself to make it work. As an example, here is how you can create an `Option` type that can hold any value (or not):
@@ -199,3 +224,13 @@ export const Option = {
 // Correctly infers maybeNum: OptionType<number>
 const maybeNum = Math.random() > 0.5 ? Option.some(4) : Option.none(); 
 ```
+
+This exported Option object works just like one that would come from `discUnion`, except it is generic. The only thing missing is the `key` property attached to the constructor, if you would like to add that, you can wrap your function in an `Object.assign` like so:
+
+```ts
+const some = Object.assign(
+  <T>(value: T) => createType('some', { value }),
+  { key: 'some' as 'some' } 
+);
+```
+
