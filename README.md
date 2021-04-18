@@ -209,11 +209,12 @@ const _Option = discUnion({
   none: () => ({}),
 });
 
-// Write the generic constructor yourself (you can still use createType)
+// Write the generic type and constructor yourself (you can still use createType)
+export type Some<T> = { type: 'some', value: T };
 const some = <T>(value: T) => createType('some', { value });
 
 // Wrap DiscUnionOf with your own generic type
-export type OptionType<T> = DiscUnionOf<typeof _Option> | { type: 'some', value: T };
+export type OptionType<T> = DiscUnionOf<typeof _Option> | Some<T>;
 
 // Spread the new constructor into the object
 export const Option = {

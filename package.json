@@ -1,6 +1,6 @@
 {
   "name": "disc-union",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "A set utilities for working with discriminated unions in typescript",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -14,7 +14,13 @@
     "type": "git",
     "url": "git+https://github.com/BobbyGerace/disc-union.git"
   },
-  "keywords": [],
+  "keywords": [
+    "discriminated union",
+    "tagged union",
+    "typescript",
+    "sum type",
+    "pattern matching"
+  ],
   "author": "",
   "license": "ISC",
   "bugs": {
