@@ -96,7 +96,7 @@ export const factory = <FactoryTypeKey extends string>(
     TypeKey extends string | FactoryTypeKey = FactoryTypeKey
   >(
     value: T,
-    handlers: R,
+    handlers: keyof R extends Keys<T, TypeKey> ? R : never,
     otherwise: (value: Without<T, keyof R, TypeKey>) => E,
     typeKey?: TypeKey
   ): (R extends Partial<Handlers<T, infer RT, TypeKey>> ? RT : never) | E;
@@ -107,7 +107,7 @@ export const factory = <FactoryTypeKey extends string>(
     TypeKey extends string | FactoryTypeKey = FactoryTypeKey
   >(
     value: T,
-    handlers: R,
+    handlers: keyof R extends Keys<T, TypeKey> ? R : never,
     ot?: TypeKey | ((value: Without<T, keyof R, TypeKey>) => E),
     tk?: TypeKey
   ) {
