@@ -71,6 +71,15 @@ export type Handlers<
   [K in T[TypeKey]]: (s: Narrow<T, K, TypeKey>) => R;
 };
 
+export type PartialHandlers<
+  T extends DiscUnionType<TypeKey>,
+  TKeys extends T[TypeKey],
+  R,
+  TypeKey extends string = "type"
+> = {
+  [K in TKeys]: (s: Narrow<T, K, TypeKey>) => R;
+};
+
 /**
  * Factory function that creates the disc-union functions. Use this
  * to have a different default discriminant than 'type'
@@ -91,28 +100,30 @@ export const factory = <FactoryTypeKey extends string>(
   ): R extends Handlers<T, infer RT, TypeKey> ? RT : never;
   function match<
     T extends DiscUnionType<TypeKey>,
-    R extends Partial<Handlers<T, unknown, TypeKey>>,
+    TKeys extends T[TypeKey],
+    RT,
     E,
     TypeKey extends string | FactoryTypeKey = FactoryTypeKey
   >(
     value: T,
-    handlers: keyof R extends Keys<T, TypeKey> ? R : never,
-    otherwise: (value: Without<T, keyof R, TypeKey>) => E,
+    handlers: PartialHandlers<T, TKeys, RT, TypeKey>,
+    otherwise: (value: Without<T, TKeys, TypeKey>) => E,
     typeKey?: TypeKey
-  ): (R extends Partial<Handlers<T, infer RT, TypeKey>> ? RT : never) | E;
+  ): RT | E;
   function match<
     T extends DiscUnionType<TypeKey>,
-    R extends Partial<Handlers<T, unknown, TypeKey>>,
+    TKeys extends T[TypeKey],
+    RT,
     E,
     TypeKey extends string | FactoryTypeKey = FactoryTypeKey
   >(
     value: T,
-    handlers: keyof R extends Keys<T, TypeKey> ? R : never,
-    ot?: TypeKey | ((value: Without<T, keyof R, TypeKey>) => E),
+    handlers: PartialHandlers<T, TKeys, RT, TypeKey>,
+    ot?: TypeKey | ((value: Without<T, TKeys, TypeKey>) => E),
     tk?: TypeKey
   ) {
     let typeKey: TypeKey;
-    let otherwise: (value: Without<T, keyof R, TypeKey>) => E;
+    let otherwise: (value: Without<T, TKeys, TypeKey>) => E;
     if (typeof ot === "function") {
       otherwise = ot;
       typeKey = tk ?? (factoryTypeKey as TypeKey);
@@ -120,11 +131,11 @@ export const factory = <FactoryTypeKey extends string>(
       typeKey = ot ?? (factoryTypeKey as TypeKey);
     }
 
-    const handler = handlers[value[typeKey] as T[TypeKey]];
+    const handler = handlers[value[typeKey] as TKeys];
 
     return handler ? handler(
-      value as Extract<T, { [M in TypeKey]: string }>
-    ) : otherwise!(value as Exclude<T, { [M in TypeKey]: keyof R }>);
+      value as any
+    ) : otherwise!(value as any);
   }
 
   const is = <

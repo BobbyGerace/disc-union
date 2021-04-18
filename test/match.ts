@@ -27,6 +27,7 @@ describe('match', () => {
   
   it('handles partial match correctly', () => {
     const matchFBB = (fbb: FBB) => match(fbb, {
+      bang: () => true,
       foo: foo => foo.msg,
     }, fbb => fbb.type);
 
