@@ -1,9 +1,10 @@
 {
   "name": "disc-union",
-  "version": "1.0.4",
+  "version": "1.0.5",
   "description": "A set utilities for working with discriminated unions in typescript",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
+  "files": ["dist/"],
   "scripts": {
     "test": "jest",
     "test:watch": "jest --watch",
@@ -22,7 +23,7 @@
     "sum type",
     "pattern matching"
   ],
-  "author": "",
+  "author": "Bobby Gerace <rfgerace@gmail.com>",
   "license": "ISC",
   "bugs": {
     "url": "https://github.com/BobbyGerace/disc-union/issues"
