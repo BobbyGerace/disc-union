@@ -1,6 +1,6 @@
 {
   "name": "disc-union",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "A set utilities for working with discriminated unions in typescript",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",

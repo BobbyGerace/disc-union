@@ -71,15 +71,6 @@ export type Handlers<
   [K in T[TypeKey]]: (s: Narrow<T, K, TypeKey>) => R;
 };
 
-export type PartialHandlers<
-  T extends DiscUnionType<TypeKey>,
-  TKeys extends T[TypeKey],
-  R,
-  TypeKey extends string = "type"
-> = {
-  [K in TKeys]: (s: Narrow<T, K, TypeKey>) => R;
-};
-
 /**
  * Factory function that creates the disc-union functions. Use this
  * to have a different default discriminant than 'type'
@@ -95,35 +86,34 @@ export const factory = <FactoryTypeKey extends string>(
     TypeKey extends string | FactoryTypeKey = FactoryTypeKey
   >(
     value: T,
-    handlers: R,
+    // We can get better error messages by defaulting to Handlers instead of R when invalid
+    handlers: Handlers<T, unknown, TypeKey> extends R ? R : Handlers<T, unknown, TypeKey>,
     typeKey?: TypeKey
-  ): R extends Handlers<T, infer RT, TypeKey> ? RT : never;
+  ): (R extends Handlers<T, infer RT, TypeKey> ? RT : never);
   function match<
     T extends DiscUnionType<TypeKey>,
-    TKeys extends T[TypeKey],
-    RT,
+    R extends Partial<Handlers<T, unknown, TypeKey>>,
     E,
     TypeKey extends string | FactoryTypeKey = FactoryTypeKey
   >(
     value: T,
-    handlers: PartialHandlers<T, TKeys, RT, TypeKey>,
-    otherwise: (value: Without<T, TKeys, TypeKey>) => E,
+    handlers: Handlers<T, unknown, TypeKey> extends R ? R : Partial<Handlers<T, unknown, TypeKey>>,
+    otherwise: (value: Without<T, keyof R, TypeKey>) => E,
     typeKey?: TypeKey
-  ): RT | E;
+  ): (R extends Partial<Handlers<T, infer RT, TypeKey>> ? RT : never) | E;
   function match<
     T extends DiscUnionType<TypeKey>,
-    TKeys extends T[TypeKey],
-    RT,
+    R extends Partial<Handlers<T, unknown, TypeKey>>,
     E,
     TypeKey extends string | FactoryTypeKey = FactoryTypeKey
   >(
     value: T,
-    handlers: PartialHandlers<T, TKeys, RT, TypeKey>,
-    ot?: TypeKey | ((value: Without<T, TKeys, TypeKey>) => E),
+    handlers: Handlers<T, unknown, TypeKey> extends R ? R : Partial<Handlers<T, unknown, TypeKey>>,
+    ot: (value: Without<T, keyof R, TypeKey>) => E,
     tk?: TypeKey
   ) {
     let typeKey: TypeKey;
-    let otherwise: (value: Without<T, TKeys, TypeKey>) => E;
+    let otherwise: (value: Without<T, keyof R, TypeKey>) => E;
     if (typeof ot === "function") {
       otherwise = ot;
       typeKey = tk ?? (factoryTypeKey as TypeKey);
@@ -131,7 +121,7 @@ export const factory = <FactoryTypeKey extends string>(
       typeKey = ot ?? (factoryTypeKey as TypeKey);
     }
 
-    const handler = handlers[value[typeKey] as TKeys];
+    const handler = handlers[value[typeKey]];
 
     return handler ? handler(
       value as any

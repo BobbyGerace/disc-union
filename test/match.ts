@@ -17,7 +17,7 @@ describe('match', () => {
     const matchFBB = (fbb: FBB) => match(fbb, {
       foo: foo => foo.msg,
       bar: bar => bar.count,
-      baz: () => true
+      baz: () => true,
     });
 
     expect(matchFBB(someFoo)).toBe('hello');
@@ -28,10 +28,11 @@ describe('match', () => {
   it('handles partial match correctly', () => {
     const matchFBB = (fbb: FBB) => match(fbb, {
       foo: foo => foo.msg,
+      bar: foo => foo.count,
     }, fbb => fbb.type);
 
     expect(matchFBB(someFoo)).toBe('hello');
-    expect(matchFBB(someBar)).toBe('bar');
+    expect(matchFBB(someBar)).toBe(4);
     expect(matchFBB(someBaz)).toBe('baz');
   });
   

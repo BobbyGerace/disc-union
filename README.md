@@ -4,7 +4,7 @@ A set utilities for working with discriminated unions in typescript
 ## Introduction
 Discriminated unions are a powerful and expressive way of modelling data in Typescript, but working with them often requires a lot of boilerplate code. This library is a collection of utilities for creating and handling discriminated union types in a way that is more elegant and concise. 
 
-We aim to be generic by leveraging Typescripts type inference to determine the types. So these functions work well with any discriminated union, no matter how they are constructed.
+We aim to keep this library as generic as possible, so these functions are designed work well with any discriminated union, no matter how they are constructed.
 
 Note: This library uses Typescript's template literal types, and so requires Typescript version >= 4.1
 
