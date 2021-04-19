@@ -7,8 +7,9 @@
   "scripts": {
     "test": "jest",
     "test:watch": "jest --watch",
-    "prepublish": "tsc",
-    "build": "tsc"
+    "prepare": "npm run build",
+    "prepublishOnly": "npm run test",
+    "build": "tsc -p ./tsconfig.build.json"
   },
   "repository": {
     "type": "git",
