@@ -20,7 +20,7 @@ const ApiResult = discUnion({
 
 /**
  * use DiscUnionOf to extract the type of the discriminated union
- * ApiResultType = 
+ * ApiResult = 
  *  | { type: 'success', post: Posts[] } 
  *  | { type: 'error', message: string }
  *  | { type: 'loading' }
@@ -28,27 +28,39 @@ const ApiResult = discUnion({
 type ApiResultType = DiscUnionOf<typeof ApiResult>;
 
 // discUnion returns constructor functions for each type
+const { success, error, loading } = ApiResult;
+
 const fetchPosts = () =>
   fetch('https://jsonplaceholder.typicode.com/posts')
     .then((response) => response.json() as Promise<Post[]>)
-    .then(posts => ApiResult.success(posts))
-    .catch(() => ApiResult.error('Something went wrong'));
+    .then(posts => success(posts))
+    .catch(() => error('Something went wrong'));
 
 function Posts() {
-  const [apiState, setApiState] = useState<ApiResultType>(ApiResult.loading());
+  const [apiState, setApiState] = useState<ApiResultType>(loading());
 
   useEffect(() => {
     fetchPosts().then(setApiState)
   }, [])
 
+  // Static methods are attached to each constructor to conveniently work with types
+  const numPosts = success.get(apiState)?.posts.length ?? '---';
+
+  if (error.is(apiState)) console.error('Oops!', apiState.message);
+
   // Use the match function to exhaustively match each type
-  return match(apiState, {
+  const pageContent = match(apiState, {
     success: ({ posts }) => <div>
       {posts.map(p => <div key={p.id}>{p.body}</div>)}
     </div>,
     error: ({ message }) => <span>Error: {message}</span>,
-    loading: () => <div>loading...</div>
+    loading: () => <div>Loading...</div>
   });
+
+  return <div>
+    <span>{numPosts} Posts</span>
+    {pageContent}
+  </div>;
 }
 ```
 
@@ -90,7 +102,7 @@ match(dino, {
 
 #### Constructor static functions
 
-For convenience, the constructor function has several "static" functions attached to it: `is`, `get`, `map`, and `validate`. These all are equivalent to the top level functions of the same names, but with `type` and `typeKey` arguments are already bound. Some examples:
+For convenience, the constructor functions have several "static" functions attached to it: `is`, `get`, `map`, and `validate`. These all are equivalent to the top level functions of the same names (see below), but with `type` and `typeKey` arguments are already bound. Here are some examples of their usage:
 
 ```ts
   const { tRex, pterodactyl, stegosaurus } = Dinosaur;

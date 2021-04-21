@@ -1,10 +1,12 @@
 {
   "name": "disc-union",
-  "version": "1.0.5",
+  "version": "1.1.0",
   "description": "A set utilities for working with discriminated unions in typescript",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
-  "files": ["dist/"],
+  "files": [
+    "dist/"
+  ],
   "scripts": {
     "test": "jest",
     "test:watch": "jest --watch",

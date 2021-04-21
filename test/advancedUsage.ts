@@ -1,7 +1,7 @@
 import { DiscUnionOf, discUnion, createType, get, attachExtras } from '../src';
 
-describe('generics', () => {
-  it('Option type works', () => {
+describe('advanced usage', () => {
+  it('generic types work', () => {
     const _Option = discUnion({
       none: () => ({}),
     });
