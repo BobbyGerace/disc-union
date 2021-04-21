@@ -1,6 +1,12 @@
 # disc-union
 A set utilities for working with discriminated unions in typescript
 
+## Installation
+
+```
+npm i disc-union
+```
+
 ## Introduction
 Discriminated unions are a powerful and expressive way of modelling data in Typescript, but working with them often requires a lot of boilerplate code. This library is a collection of utilities for creating and handling discriminated union types in a way that is more elegant and concise. 
 

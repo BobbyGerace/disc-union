@@ -1,7 +1,7 @@
 import {
   DiscUnionType,
   ConstructorsWithType,
-  Constructor,
+  ObjKey,
   Constructors,
   Narrow,
   ConstructorExtras,
@@ -22,7 +22,7 @@ export const factory = <FactoryTypeKey extends string>(
   function match<
     T extends DiscUnionType<TypeKey>,
     R extends Handlers<T, unknown, TypeKey>,
-    TypeKey extends string | FactoryTypeKey = FactoryTypeKey
+    TypeKey extends ObjKey | FactoryTypeKey = FactoryTypeKey
   >(
     value: T,
     // We can get better error messages by defaulting to Handlers instead of R when invalid
@@ -33,7 +33,7 @@ export const factory = <FactoryTypeKey extends string>(
     T extends DiscUnionType<TypeKey>,
     R extends Partial<Handlers<T, unknown, TypeKey>>,
     E,
-    TypeKey extends string | FactoryTypeKey = FactoryTypeKey
+    TypeKey extends ObjKey | FactoryTypeKey = FactoryTypeKey
   >(
     value: T,
     handlers: Handlers<T, unknown, TypeKey> extends R ? R : Partial<Handlers<T, unknown, TypeKey>>,
@@ -44,7 +44,7 @@ export const factory = <FactoryTypeKey extends string>(
     T extends DiscUnionType<TypeKey>,
     R extends Partial<Handlers<T, unknown, TypeKey>>,
     E,
-    TypeKey extends string | FactoryTypeKey = FactoryTypeKey
+    TypeKey extends ObjKey | FactoryTypeKey = FactoryTypeKey
   >(
     value: T,
     handlers: Handlers<T, unknown, TypeKey> extends R ? R : Partial<Handlers<T, unknown, TypeKey>>,
@@ -70,7 +70,7 @@ export const factory = <FactoryTypeKey extends string>(
   const is = <
     T extends DiscUnionType<TypeKey>,
     K extends T[TypeKey],
-    TypeKey extends string | FactoryTypeKey = FactoryTypeKey
+    TypeKey extends ObjKey | FactoryTypeKey = FactoryTypeKey
   >(
     type: K,
     value: T,
@@ -80,13 +80,13 @@ export const factory = <FactoryTypeKey extends string>(
   function discUnion<
     T extends Constructors,
     P extends string = '',
-    TypeKey extends string | FactoryTypeKey = FactoryTypeKey
+    TypeKey extends ObjKey | FactoryTypeKey = FactoryTypeKey
   >(
     constructors: T,
     typeKey = factoryTypeKey as TypeKey,
     prefix = '' as P,
   ): ConstructorsWithType<T, TypeKey, P> {
-    const constructorsWithType: Record<string, Function & { key?: string }> = {};
+    const constructorsWithType: Record<ObjKey, Function & { key?: ObjKey }> = {};
 
     for (const key in constructors) {
       const fullKey = prefix + key;
@@ -98,13 +98,22 @@ export const factory = <FactoryTypeKey extends string>(
       ) 
     }
 
+    const symbols = Object.getOwnPropertySymbols?.(constructors) ?? [];
+    symbols.forEach(symbol => {
+      constructorsWithType[symbol as any] = attachExtras(
+        (...args: any[]) => createType(symbol, constructors[symbol as any](...args), typeKey),
+        symbol,
+        typeKey
+      ) 
+    });
+
     return constructorsWithType as ConstructorsWithType<T, TypeKey, P>;
   };
 
   const createType = <
-    T extends string,
+    T extends ObjKey,
     O extends object,
-    TypeKey extends string | FactoryTypeKey = FactoryTypeKey
+    TypeKey extends ObjKey | FactoryTypeKey = FactoryTypeKey
   >(
     type: T,
     obj: O,
@@ -114,7 +123,7 @@ export const factory = <FactoryTypeKey extends string>(
   const validate = <
     T extends DiscUnionType<TypeKey>,
     K extends T[TypeKey],
-    TypeKey extends string | FactoryTypeKey = FactoryTypeKey
+    TypeKey extends ObjKey | FactoryTypeKey = FactoryTypeKey
   >(
     type: K,
     obj: T,
@@ -123,14 +132,14 @@ export const factory = <FactoryTypeKey extends string>(
     if (is(type, obj, typeKey)) return obj;
     else
       throw new Error(
-        formatError(type, obj[typeKey])
+        formatError(type.toString(), obj[typeKey].toString())
       );
   };
 
   function get<
     T extends DiscUnionType<TypeKey>,
     K extends T[TypeKey],
-    TypeKey extends string = FactoryTypeKey
+    TypeKey extends ObjKey = FactoryTypeKey
   >(
     type: K,
     obj: Narrow<T, K, TypeKey>,
@@ -139,12 +148,12 @@ export const factory = <FactoryTypeKey extends string>(
   function get<
     T extends DiscUnionType<TypeKey>,
     K extends T[TypeKey],
-    TypeKey extends string | FactoryTypeKey = FactoryTypeKey
+    TypeKey extends ObjKey | FactoryTypeKey = FactoryTypeKey
   >(type: K, obj: T, typeKey?: TypeKey): Narrow<T, K, TypeKey> | null;
   function get<
     T extends DiscUnionType<TypeKey>,
     K extends T[TypeKey],
-    TypeKey extends string | FactoryTypeKey = FactoryTypeKey
+    TypeKey extends ObjKey | FactoryTypeKey = FactoryTypeKey
   >(
     type: K,
     obj: T,
@@ -158,7 +167,7 @@ export const factory = <FactoryTypeKey extends string>(
     T extends DiscUnionType<TypeKey>,
     K extends T[TypeKey],
     R,
-    TypeKey extends string | FactoryTypeKey = FactoryTypeKey
+    TypeKey extends ObjKey | FactoryTypeKey = FactoryTypeKey
   >(
     type: K,
     obj: T,
@@ -171,13 +180,13 @@ export const factory = <FactoryTypeKey extends string>(
 
   const attachExtras = <
     Fn extends (args: unknown[]) => DiscUnionType<TypeKey>, 
-    K extends string,
-    TypeKey extends string | FactoryTypeKey = FactoryTypeKey
+    K extends ObjKey,
+    TypeKey extends ObjKey | FactoryTypeKey = FactoryTypeKey
   >(fn: Fn, type: K, typeKey = factoryTypeKey as TypeKey): Fn & ConstructorExtras<K, TypeKey> => {
     const extras : ConstructorExtras<K, TypeKey> = {
       key: type as K,
       is<T extends DiscUnionType<TypeKey>>(obj: T): obj is Narrow<T, K, TypeKey> {
-        return (obj[typeKey] as string) === type;
+        return (obj[typeKey] as ObjKey) === type;
       },
       map<T extends DiscUnionType<TypeKey>, R>(obj: T, mapper: (val: Narrow<T, K, TypeKey>) => R): T | R {
         return extras.is(obj) ? mapper(obj) : obj;
@@ -189,7 +198,7 @@ export const factory = <FactoryTypeKey extends string>(
         if (extras.is(obj)) return obj;
         else
           throw new Error(
-            formatError(type, obj[typeKey])
+            formatError(type.toString(), obj[typeKey].toString())
           );
         },
     }

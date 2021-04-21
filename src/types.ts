@@ -1,9 +1,10 @@
-export type DiscUnionType<TypeKey extends string> = { [M in TypeKey]: string };
+export type ObjKey = string | symbol;
+export type DiscUnionType<TypeKey extends ObjKey> = { [M in TypeKey]: ObjKey };
 
 export type Constructor = (...args: any[]) => object;
-export type Constructors = Record<string, Constructor>;
+export type Constructors = Record<ObjKey, Constructor>;
 
-export type WithType<T extends object, K extends string, TypeKey extends string> = Omit<T, TypeKey> & { [M in TypeKey]: K };
+export type WithType<T extends object, K extends ObjKey, TypeKey extends ObjKey> = Omit<T, TypeKey> & { [M in TypeKey]: K };
 
 /**
  * Takes an object of type constructors, and returns a discriminated
@@ -23,8 +24,8 @@ export type DiscUnionOf<
  */
 export type Narrow<
   T extends DiscUnionType<TypeKey>,
-  K extends string,
-  TypeKey extends string = "type"
+  K extends ObjKey,
+  TypeKey extends ObjKey = "type"
 > = Extract<T, { [M in TypeKey]: K }>;
 
 /**
@@ -35,8 +36,8 @@ export type Narrow<
  */
 export type Without<
   T extends DiscUnionType<TypeKey>,
-  K extends string | number | symbol,
-  TypeKey extends string = "type"
+  K extends ObjKey | number,
+  TypeKey extends ObjKey = "type"
 > = Exclude<T, { [M in TypeKey]: K }>;
 
 /**
@@ -47,32 +48,32 @@ export type Without<
  */
 export type Keys<
   T extends DiscUnionType<TypeKey>,
-  TypeKey extends string = "type"
+  TypeKey extends ObjKey = "type"
 > = T[TypeKey];
 
 export type ConstructorsWithType<
   T extends Constructors,
-  TypeKey extends string = "type",
+  TypeKey extends ObjKey = "type",
   Prefix extends string = '',
 > = {
   [K in keyof T]: {
     <R extends ReturnType<T[K]>>(
       ...args: Parameters<T[K]>
-    ): WithType<R, `${Prefix}${Extract<K, string>}`, TypeKey>;
-  } & ConstructorExtras<`${Prefix}${Extract<K, string>}`, TypeKey>
+    ): WithType<R, K extends string ? `${Prefix}${K}` : Extract<K, symbol>, TypeKey>;
+  } & ConstructorExtras<K extends string ? `${Prefix}${K}` : Extract<K, symbol>, TypeKey>
 };
 
 export type Handlers<
   T extends DiscUnionType<TypeKey>,
   R,
-  TypeKey extends string = "type"
+  TypeKey extends ObjKey = "type"
 > = {
   [K in T[TypeKey]]: (s: Narrow<T, K, TypeKey>) => R;
 };
 
 export type ConstructorExtras<
-  K extends string,
-  TypeKey extends string = 'type',
+  K extends ObjKey,
+  TypeKey extends ObjKey = 'type',
 > = {
   key: K,
   is: <T extends DiscUnionType<TypeKey>>(obj: T) =>  obj is Narrow<T, K, TypeKey>;
