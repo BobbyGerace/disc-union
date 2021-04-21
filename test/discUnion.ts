@@ -85,4 +85,37 @@ describe('discUnion', () => {
       [stegosaurus.key]: () => null,
     })
   });
+
+  it('helpers', () => {
+    const Dinosaur = discUnion({
+      tRex: (name: string) => ({ name }),
+      pterodactyl: (wingspan: number) => ({ wingspan }),
+      stegosaurus: (numPlates: number) => ({ numPlates })
+    });
+    type Dinosaur = DiscUnionOf<typeof Dinosaur>;
+
+    const { tRex, pterodactyl, stegosaurus } = Dinosaur;
+
+    const someTRex = Dinosaur.tRex('Bill');
+    const somePterodactyl = Dinosaur.pterodactyl(16);
+    const someStegosaurus = Dinosaur.stegosaurus(7);
+
+    // Below is just to make sure type checking works
+
+    const unknownTRex = someTRex as Dinosaur;
+
+    if (tRex.is(unknownTRex)) {
+      unknownTRex.name;
+    }
+
+    if (pterodactyl.is(unknownTRex)) {
+      unknownTRex.wingspan;
+    }
+
+    match(unknownTRex, {
+      [tRex.key]: () => null,
+      [pterodactyl.key]: () => null,
+      [stegosaurus.key]: () => null,
+    })
+  });
 });

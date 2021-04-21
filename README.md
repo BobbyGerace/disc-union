@@ -88,6 +88,24 @@ match(dino, {
 }, 'species');
 ```
 
+#### Constructor static functions
+
+For convenience, the constructor function has several "static" functions attached to it: `is`, `get`, `map`, and `validate`. These all are equivalent to the top level functions of the same names, but with `type` and `typeKey` arguments are already bound. Some examples:
+
+```ts
+  const { tRex, pterodactyl, stegosaurus } = Dinosaur;
+
+  if (tRex.is(someDino)) {
+    console.log(tRex.armsize);
+  }
+
+  const wingspan = pterodactyl.get(someDino)?.wingspan ?? 0;
+
+  const wingspan = pterodactyl.validate(someDino).wingspan;
+
+  const changedToStego = tRex.map(someDino, tRex => stegosaurus(armSize.length));
+```
+
 ### match
 `(handlers: Handlers, typeKey?: string) => Return of matched handler`
 
@@ -226,12 +244,12 @@ export const Option = {
 const maybeNum = Math.random() > 0.5 ? Option.some(4) : Option.none(); 
 ```
 
-This exported Option object works just like one that would come from `discUnion`, except it is generic. The only thing missing is the `key` property attached to the constructor, if you would like to add that, you can wrap your function in an `Object.assign` like so:
+This exported Option object works just like one that would come from `discUnion`, except it is generic. The only thing missing is the static properties attached to the constructor, if you would like to add that, you can wrap your function in the `attachExtras` function like so
 
 ```ts
-const some = Object.assign(
+const some = attachExtras(
   <T>(value: T) => createType('some', { value }),
-  { key: 'some' as 'some' } 
+  'some',
 );
 ```
 
