@@ -50,9 +50,7 @@ function Posts() {
 
   // Use the match function to exhaustively match each type
   const pageContent = match(apiState, {
-    success: ({ posts }) => <div>
-      {posts.map(p => <div key={p.id}>{p.body}</div>)}
-    </div>,
+    success: ({ posts }) => posts.map(p => <div key={p.id}>{p.body}</div>),
     error: ({ message }) => <span>Error: {message}</span>,
     loading: () => <div>Loading...</div>
   });
